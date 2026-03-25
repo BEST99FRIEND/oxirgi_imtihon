@@ -266,6 +266,17 @@ class TemplateSmokeTests(APITestCase):
         self.assertContains(response, "ratingTrendChart")
         self.assertContains(response, "topGenresChart")
 
+    def test_home_template_applies_selected_trend_days(self):
+        response = self.client.get(reverse("home"), {"trend_days": "7"})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Rating Trend (7 kun)")
+        self.assertContains(response, "Top Genres (7 kun)")
+
+    def test_home_template_uses_default_for_invalid_trend_days(self):
+        response = self.client.get(reverse("home"), {"trend_days": "99"})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Rating Trend (14 kun)")
+
     def test_movie_list_template_page_loads(self):
         response = self.client.get(reverse("web-movie-list"))
         self.assertEqual(response.status_code, 200)

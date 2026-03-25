@@ -56,16 +56,21 @@
 <section class="charts-grid">
     <article class="panel chart-panel">
         <div class="section-head">
-            <h2>Rating Trend (14 kun)</h2>
+            <h2>Rating Trend ({{ selected_trend_days }} kun)</h2>
             <span class="chart-sub">Like va Dislike dinamikasi</span>
         </div>
+        <form method="get" class="chart-range-form">
+            <button type="submit" name="trend_days" value="7" class="range-pill {% if selected_trend_days == 7 %}active{% endif %}">7 kun</button>
+            <button type="submit" name="trend_days" value="14" class="range-pill {% if selected_trend_days == 14 %}active{% endif %}">14 kun</button>
+            <button type="submit" name="trend_days" value="30" class="range-pill {% if selected_trend_days == 30 %}active{% endif %}">30 kun</button>
+        </form>
         <canvas id="ratingTrendChart" height="190"></canvas>
     </article>
 
     <article class="panel chart-panel">
         <div class="section-head">
-            <h2>Top Genres</h2>
-            <span class="chart-sub">Film soni bo'yicha TOP 8</span>
+            <h2>Top Genres ({{ selected_trend_days }} kun)</h2>
+            <span class="chart-sub">Tanlangan oraliqda film soni bo'yicha TOP 8</span>
         </div>
         <canvas id="topGenresChart" height="190"></canvas>
     </article>
@@ -137,6 +142,17 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: {
+                    duration: 1200,
+                    easing: "easeOutQuart",
+                },
+                transitions: {
+                    active: {
+                        animation: {
+                            duration: 350,
+                        },
+                    },
+                },
                 plugins: {
                     legend: {
                         position: "top",
@@ -182,6 +198,10 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: {
+                    duration: 1100,
+                    easing: "easeOutBack",
+                },
                 plugins: {
                     legend: {
                         display: false,

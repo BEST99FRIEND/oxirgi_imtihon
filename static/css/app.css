@@ -392,6 +392,7 @@ textarea:focus {
 
 .chart-panel {
     min-height: 320px;
+    animation: panel-rise 0.55s ease both;
 }
 
 .chart-panel .section-head {
@@ -408,8 +409,54 @@ textarea:focus {
     height: 240px !important;
 }
 
+.chart-range-form {
+    display: flex;
+    gap: 0.45rem;
+    margin-bottom: 0.85rem;
+}
+
+.range-pill {
+    border: 1px solid #d7c9b3;
+    background: #fff;
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 0.34rem 0.7rem;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.range-pill:hover {
+    border-color: var(--brand);
+    transform: translateY(-1px);
+}
+
+.range-pill.active {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(211, 84, 0, 0.22);
+}
+
+@keyframes panel-rise {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 @media (max-width: 900px) {
     .charts-grid {
         grid-template-columns: 1fr;
+    }
+
+    .chart-range-form {
+        flex-wrap: wrap;
     }
 }

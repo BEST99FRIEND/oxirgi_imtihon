@@ -41,8 +41,16 @@ class CustomLogoutView(LogoutView):
 class HomePageView(TemplateView):
     template_name = "home.html"
 
-    def _build_rating_trend(self):
-        start_date = timezone.localdate() - timedelta(days=13)
+    def _get_trend_days(self):
+        raw_days = self.request.GET.get("trend_days", "14")
+        if raw_days and raw_days.isdigit():
+            parsed = int(raw_days)
+            if parsed in {7, 14, 30}:
+                return parsed
+        return 14
+
+    def _build_rating_trend(self, days):
+        start_date = timezone.localdate() - timedelta(days=days - 1)
 
         rows = (
             Rating.objects.filter(created_at__date__gte=start_date)
@@ -67,7 +75,7 @@ class HomePageView(TemplateView):
         likes = []
         dislikes = []
 
-        for offset in range(14):
+        for offset in range(days):
             current_day = start_date + timedelta(days=offset)
             labels.append(current_day.strftime("%m-%d"))
             day_stats = mapped.get(current_day, {"likes": 0, "dislikes": 0})
@@ -76,9 +84,16 @@ class HomePageView(TemplateView):
 
         return labels, likes, dislikes
 
-    def _build_top_genres(self):
+    def _build_top_genres(self, days):
+        start_date = timezone.localdate() - timedelta(days=days - 1)
         rows = (
-            Genre.objects.annotate(movie_count=Count("movies", distinct=True))
+            Genre.objects.annotate(
+                movie_count=Count(
+                    "movies",
+                    filter=Q(movies__created_at__date__gte=start_date),
+                    distinct=True,
+                )
+            )
             .filter(movie_count__gt=0)
             .order_by("-movie_count", "name")[:8]
         )
@@ -104,14 +119,16 @@ class HomePageView(TemplateView):
             .order_by("-created_at")[:6]
         )
 
-        rating_labels, rating_likes, rating_dislikes = self._build_rating_trend()
-        genre_labels, genre_movie_counts = self._build_top_genres()
+        trend_days = self._get_trend_days()
+        rating_labels, rating_likes, rating_dislikes = self._build_rating_trend(trend_days)
+        genre_labels, genre_movie_counts = self._build_top_genres(trend_days)
 
         context["rating_trend_labels"] = json.dumps(rating_labels)
         context["rating_trend_likes"] = json.dumps(rating_likes)
         context["rating_trend_dislikes"] = json.dumps(rating_dislikes)
         context["top_genre_labels"] = json.dumps(genre_labels)
         context["top_genre_movie_counts"] = json.dumps(genre_movie_counts)
+        context["selected_trend_days"] = trend_days
 
         if self.request.user.is_authenticated:
             context["subscription"] = MovieSubscriber.objects.filter(
