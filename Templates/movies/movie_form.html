@@ -1,0 +1,19 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Movie Form{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+    <div class="panel auth-panel wide">
+        <h2>{% if object %}Filmni tahrirlash{% else %}Yangi film qo'shish{% endif %}</h2>
+        <form method="post" class="stack-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="action-inline">
+                <button class="btn" type="submit">Saqlash</button>
+                <a class="btn btn-ghost" href="{% url 'web-movie-list' %}">Bekor qilish</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

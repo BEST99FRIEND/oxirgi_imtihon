@@ -1,0 +1,19 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Genre Form{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+    <div class="panel auth-panel wide">
+        <h2>{% if object %}Janrni tahrirlash{% else %}Yangi janr qo'shish{% endif %}</h2>
+        <form method="post" class="stack-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="action-inline">
+                <button class="btn" type="submit">Saqlash</button>
+                <a class="btn btn-ghost" href="{% url 'web-genre-list' %}">Bekor qilish</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

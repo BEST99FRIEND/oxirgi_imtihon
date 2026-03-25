@@ -1,0 +1,202 @@
+﻿{% extends "base.html" %}
+
+{% block title %}MovieVerse | Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div>
+        <p class="eyebrow">Cinema Dashboard</p>
+        <h1>Filmlarni boshqarish, baholash va hamjamiyat fikrlarini bir joyda kuzating.</h1>
+        <p class="hero-text">
+            Ushbu sahifa orqali yangi film qo'shish, janrlarni boshqarish, izohlar va like/dislike statistikasini
+            kuzatishingiz mumkin.
+        </p>
+        <div class="hero-actions">
+            <a class="btn" href="{% url 'web-movie-list' %}">Filmlarni ko'rish</a>
+            {% if user.is_authenticated %}
+            <a class="btn btn-ghost" href="{% url 'web-movie-create' %}">Yangi film</a>
+            {% else %}
+            <a class="btn btn-ghost" href="{% url 'web-login' %}">Tizimga kirish</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="stat-grid">
+        <div class="stat-card">
+            <span>Movies</span>
+            <strong>{{ stats.movies }}</strong>
+        </div>
+        <div class="stat-card">
+            <span>Genres</span>
+            <strong>{{ stats.genres }}</strong>
+        </div>
+        <div class="stat-card">
+            <span>Comments</span>
+            <strong>{{ stats.comments }}</strong>
+        </div>
+        <div class="stat-card">
+            <span>Ratings</span>
+            <strong>{{ stats.ratings }}</strong>
+        </div>
+    </div>
+</section>
+
+{% if user.is_authenticated %}
+<section class="panel compact-panel">
+    <h3>Email Notification</h3>
+    <p>Yangi film qo'shilganda email xabar holati:
+        <strong>{% if subscription %}Yoqilgan{% else %}O'chirilgan{% endif %}</strong>
+    </p>
+    <form method="post" action="{% url 'web-toggle-subscription' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-small">Holatni almashtirish</button>
+    </form>
+</section>
+{% endif %}
+
+<section class="charts-grid">
+    <article class="panel chart-panel">
+        <div class="section-head">
+            <h2>Rating Trend (14 kun)</h2>
+            <span class="chart-sub">Like va Dislike dinamikasi</span>
+        </div>
+        <canvas id="ratingTrendChart" height="190"></canvas>
+    </article>
+
+    <article class="panel chart-panel">
+        <div class="section-head">
+            <h2>Top Genres</h2>
+            <span class="chart-sub">Film soni bo'yicha TOP 8</span>
+        </div>
+        <canvas id="topGenresChart" height="190"></canvas>
+    </article>
+</section>
+
+<section>
+    <div class="section-head">
+        <h2>So'nggi qo'shilgan filmlar</h2>
+        <a href="{% url 'web-movie-list' %}">Barchasini ko'rish</a>
+    </div>
+
+    <div class="movie-grid">
+        {% for movie in latest_movies %}
+        <article class="movie-card">
+            <p class="tag">{{ movie.genre.name|default:"No genre" }}</p>
+            <h3><a href="{% url 'web-movie-detail' movie.pk %}">{{ movie.title }}</a></h3>
+            <p>{{ movie.description|truncatechars:120 }}</p>
+            <div class="meta-row">
+                <span>Release: {{ movie.release_date }}</span>
+                <span>{{ movie.duration_minutes }} min</span>
+            </div>
+            <div class="meta-row votes">
+                <span>Like: {{ movie.likes_count }}</span>
+                <span>Dislike: {{ movie.dislikes_count }}</span>
+            </div>
+        </article>
+        {% empty %}
+        <p>Hozircha filmlar yo'q.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+    const ratingLabels = {{ rating_trend_labels|safe }};
+    const likesData = {{ rating_trend_likes|safe }};
+    const dislikesData = {{ rating_trend_dislikes|safe }};
+
+    const genreLabels = {{ top_genre_labels|safe }};
+    const genreMovieCounts = {{ top_genre_movie_counts|safe }};
+
+    const ratingCtx = document.getElementById("ratingTrendChart");
+    if (ratingCtx) {
+        new Chart(ratingCtx, {
+            type: "line",
+            data: {
+                labels: ratingLabels,
+                datasets: [
+                    {
+                        label: "Like",
+                        data: likesData,
+                        borderColor: "#0f766e",
+                        backgroundColor: "rgba(15, 118, 110, 0.18)",
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 3,
+                    },
+                    {
+                        label: "Dislike",
+                        data: dislikesData,
+                        borderColor: "#b42318",
+                        backgroundColor: "rgba(180, 35, 24, 0.16)",
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 3,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "top",
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                        },
+                    },
+                },
+            },
+        });
+    }
+
+    const genreCtx = document.getElementById("topGenresChart");
+    if (genreCtx) {
+        new Chart(genreCtx, {
+            type: "bar",
+            data: {
+                labels: genreLabels,
+                datasets: [
+                    {
+                        label: "Movies count",
+                        data: genreMovieCounts,
+                        borderWidth: 1,
+                        borderColor: "#8d2f00",
+                        backgroundColor: [
+                            "#d35400",
+                            "#f59e0b",
+                            "#0f766e",
+                            "#14b8a6",
+                            "#2a9d8f",
+                            "#e76f51",
+                            "#264653",
+                            "#6d597a",
+                        ],
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                        },
+                    },
+                },
+            },
+        });
+    }
+</script>
+{% endblock %}

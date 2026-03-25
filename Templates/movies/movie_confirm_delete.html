@@ -1,0 +1,17 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Delete Movie{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+    <div class="panel auth-panel">
+        <h2>Filmni o'chirish</h2>
+        <p><strong>{{ object.title }}</strong> filmini o'chirishni tasdiqlaysizmi?</p>
+        <form method="post" class="action-inline">
+            {% csrf_token %}
+            <button class="btn btn-danger" type="submit">Ha, o'chir</button>
+            <a class="btn btn-ghost" href="{% url 'web-movie-detail' object.pk %}">Yo'q</a>
+        </form>
+    </div>
+</section>
+{% endblock %}

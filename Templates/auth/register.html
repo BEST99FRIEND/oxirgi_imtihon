@@ -1,0 +1,18 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+    <div class="panel auth-panel">
+        <h2>Register</h2>
+        <p>Yangi foydalanuvchi yarating va movie platformaga qo'shiling.</p>
+        <form method="post" class="stack-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Ro'yxatdan o'tish</button>
+        </form>
+        <p class="auth-foot">Hisobingiz bormi? <a href="{% url 'web-login' %}">Kirish</a>.</p>
+    </div>
+</section>
+{% endblock %}

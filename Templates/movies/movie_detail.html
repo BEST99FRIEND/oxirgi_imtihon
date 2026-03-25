@@ -1,0 +1,80 @@
+﻿{% extends "base.html" %}
+
+{% block title %}{{ movie.title }}{% endblock %}
+
+{% block content %}
+<section class="panel movie-detail">
+    <div class="section-head">
+        <h2>{{ movie.title }}</h2>
+        {% if can_edit %}
+        <div class="action-inline">
+            <a class="btn btn-small" href="{% url 'web-movie-edit' movie.pk %}">Tahrirlash</a>
+            <a class="btn btn-danger btn-small" href="{% url 'web-movie-delete' movie.pk %}">O'chirish</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <p class="tag">{{ movie.genre.name|default:"No genre" }}</p>
+    <p>{{ movie.description }}</p>
+
+    <div class="meta-row">
+        <span>Release: {{ movie.release_date }}</span>
+        <span>Duration: {{ movie.duration_minutes }} min</span>
+        <span>Author: {{ movie.created_by.username }}</span>
+    </div>
+
+    <div class="meta-row votes">
+        <span>Like: {{ movie.likes_count }}</span>
+        <span>Dislike: {{ movie.dislikes_count }}</span>
+        <span>Comment: {{ movie.comments_count }}</span>
+    </div>
+</section>
+
+<section class="panel">
+    <h3>Baholash</h3>
+    {% if user.is_authenticated %}
+        <div class="action-inline">
+            <form method="post" action="{% url 'web-set-rating' movie.pk 'like' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-small">Like</button>
+            </form>
+            <form method="post" action="{% url 'web-set-rating' movie.pk 'dislike' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-small">Dislike</button>
+            </form>
+        </div>
+        {% if user_rating %}
+        <p>Sizning reytingingiz: <strong>{% if user_rating.value == 1 %}Like{% else %}Dislike{% endif %}</strong></p>
+        {% endif %}
+    {% else %}
+        <p>Baholash uchun <a href="{% url 'web-login' %}">login</a> qiling.</p>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <h3>Izohlar</h3>
+    {% if user.is_authenticated %}
+    <form method="post" action="{% url 'web-add-comment' movie.pk %}" class="stack-form">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <button class="btn btn-small" type="submit">Izoh yuborish</button>
+    </form>
+    {% else %}
+    <p>Izoh yozish uchun <a href="{% url 'web-login' %}">login</a> qiling.</p>
+    {% endif %}
+
+    <div class="comments">
+        {% for comment in comments %}
+        <article class="comment-card">
+            <div class="meta-row">
+                <strong>{{ comment.user.username }}</strong>
+                <span>{{ comment.created_at|date:"Y-m-d H:i" }}</span>
+            </div>
+            <p>{{ comment.text }}</p>
+        </article>
+        {% empty %}
+        <p>Hozircha izoh yo'q.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

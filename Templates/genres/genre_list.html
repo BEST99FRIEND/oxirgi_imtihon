@@ -1,0 +1,30 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Genres{% endblock %}
+
+{% block content %}
+<section class="section-head">
+    <h2>Genres</h2>
+    {% if user.is_authenticated %}
+    <a class="btn btn-small" href="{% url 'web-genre-create' %}">+ Janr qo'shish</a>
+    {% endif %}
+</section>
+
+<div class="movie-grid">
+    {% for genre in genres %}
+    <article class="movie-card">
+        <p class="tag">Genre</p>
+        <h3>{{ genre.name }}</h3>
+        <p>{{ genre.description|default:"No description"|truncatechars:130 }}</p>
+        <div class="meta-row">
+            <span>{{ genre.movies.count }} film</span>
+            {% if user.is_authenticated %}
+            <a href="{% url 'web-genre-edit' genre.pk %}">Tahrirlash</a>
+            {% endif %}
+        </div>
+    </article>
+    {% empty %}
+    <p>Janrlar mavjud emas.</p>
+    {% endfor %}
+</div>
+{% endblock %}
