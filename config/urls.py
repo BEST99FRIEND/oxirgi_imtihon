@@ -2,7 +2,6 @@
 from django.http import JsonResponse
 from django.urls import include, path
 
-
 def api_schema_view(request):
     return JsonResponse(
         {
@@ -23,7 +22,6 @@ def api_schema_view(request):
             },
         }
     )
-
 
 urlpatterns = [
     path("", include("main.web_urls")),

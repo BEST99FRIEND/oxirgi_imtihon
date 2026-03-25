@@ -1,14 +1,12 @@
 ﻿from django.conf import settings
 from django.db import models
 
-
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True
-
 
 class Genre(TimeStampedModel):
     name = models.CharField(max_length=120, unique=True)
@@ -19,7 +17,6 @@ class Genre(TimeStampedModel):
 
     def __str__(self) -> str:
         return self.name
-
 
 class Movie(TimeStampedModel):
     title = models.CharField(max_length=200)
@@ -40,7 +37,6 @@ class Movie(TimeStampedModel):
     def __str__(self) -> str:
         return self.title
 
-
 class Comment(TimeStampedModel):
     movie = models.ForeignKey(Movie, related_name="comments", on_delete=models.CASCADE)
     user = models.ForeignKey(
@@ -55,7 +51,6 @@ class Comment(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"Comment by {self.user} on {self.movie}"
-
 
 class Rating(TimeStampedModel):
     LIKE = 1
@@ -83,7 +78,6 @@ class Rating(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.user} rated {self.movie}: {self.value}"
-
 
 class MovieSubscriber(TimeStampedModel):
     user = models.OneToOneField(

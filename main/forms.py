@@ -1,11 +1,9 @@
 ﻿from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
-
 from .models import Comment, Genre, Movie
 
 User = get_user_model()
-
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -13,7 +11,6 @@ class RegisterForm(UserCreationForm):
     class Meta:
         model = User
         fields = ("username", "email", "password1", "password2")
-
 
 class GenreForm(forms.ModelForm):
     class Meta:
@@ -23,7 +20,6 @@ class GenreForm(forms.ModelForm):
             "description": forms.Textarea(attrs={"rows": 4}),
         }
 
-
 class MovieForm(forms.ModelForm):
     class Meta:
         model = Movie
@@ -32,7 +28,6 @@ class MovieForm(forms.ModelForm):
             "description": forms.Textarea(attrs={"rows": 5}),
             "release_date": forms.DateInput(attrs={"type": "date"}),
         }
-
 
 class CommentForm(forms.ModelForm):
     class Meta:
